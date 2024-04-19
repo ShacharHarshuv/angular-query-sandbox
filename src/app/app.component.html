@@ -1,1 +1,7 @@
-<app-todos />
+
+<button (click)="toggleShow()">Toggle Show</button>
+
+@if (showTodos()) {
+  <app-todos />
+}
+<angular-query-devtools [initialIsOpen]="false" />

@@ -24,9 +24,12 @@ let serverState: Todo[] = [
       >
         Add Todo
       </button>
-      @if (query.isFetching()) {
+      
+      @if (query.isPending()) {
         <div>Loading...</div>
-      } @else if (query.data()) {
+      } @else if (query.isError()) {
+        <div>Error: {{ query.error().message }}</div>
+      } @else {
         <ul>
           @for (todo of query.data(); track todo.title) {
             <li>{{ todo.title }}</li>
@@ -38,7 +41,7 @@ let serverState: Todo[] = [
 })
 export class TodosComponent {
   queryClient = injectQueryClient();
-  query = injectQuery(() => ({
+  query = injectQuery<Todo[]>(() => ({
     queryKey: ['todos'],
     queryFn: () => timeoutAsPromise(1000, serverState),
   }));
