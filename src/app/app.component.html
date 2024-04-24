@@ -2,6 +2,9 @@
 <button (click)="toggleShow()">Toggle Show</button>
 
 @if (showTodos()) {
-  <app-todos />
+  <app-todos (todoOpen)="openTodo($event)" />
 }
+
+<app-todo-details [todoId]="currentTodo()"/>
+
 <angular-query-devtools [initialIsOpen]="false" />

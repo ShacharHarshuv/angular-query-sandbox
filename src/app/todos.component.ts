@@ -1,4 +1,9 @@
-import { Component, Injectable, inject } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  inject,
+  output,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import {
@@ -32,7 +37,7 @@ let serverState: Todo[] = [
       } @else {
         <ul>
           @for (todo of query.data(); track todo.title) {
-            <li>{{ todo.title }}</li>
+            <li (click)="openTodo(todo.id)">{{ todo.title }}</li>
           }
         </ul>
       }
@@ -40,6 +45,8 @@ let serverState: Todo[] = [
   `,
 })
 export class TodosComponent {
+  todoOpen = output<string>();
+
   queryClient = injectQueryClient();
   query = injectQuery<Todo[]>(() => ({
     queryKey: ['todos'],
@@ -63,6 +70,10 @@ export class TodosComponent {
       id: Date.now().toString(),
       title: 'Do Laundry',
     });
+  }
+
+  openTodo(id: string) {
+    this.todoOpen.emit(id);
   }
 }
 
