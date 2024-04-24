@@ -1,10 +1,13 @@
 import {
   Component,
-  signal,
   input,
 } from '@angular/core';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import {
+  injectQuery,
+  injectQueryClient,
+} from '@tanstack/angular-query-experimental';
 import { timeoutAsPromise } from './timeout-as-promise';
+import { Todo } from './todos.component';
 
 @Component({
   selector: 'app-todo-details',
@@ -18,20 +21,28 @@ import { timeoutAsPromise } from './timeout-as-promise';
       } @else if (query.isPending()) {
         Loading...
       } @else if (query.isError()) {
-        Error: {{ query.error().message }}
+        Error: {{ query.error()?.message }}
       } @else {
         {{ query.data() }}
       }
     </p>
   `,
-  styles: ``
+  styles: ``,
 })
 export class TodoDetailsComponent {
-  todoId = input<string | null>(null);
+  readonly queryClient = injectQueryClient();
+  readonly todoId = input<string | null>(null);
 
   query = injectQuery(() => ({
     enabled: !!this.todoId(),
     queryKey: ['todo', this.todoId()],
-    queryFn: () => timeoutAsPromise(1000, this.todoId()),
+    queryFn: () => {
+      console.log('fetch todo details');
+      return timeoutAsPromise(1000, this.todoId())
+    },
+    initialData: () => {
+      return this.queryClient.getQueryData<Todo[]>(['todos'])
+        ?.find((d) => d.id === this.todoId())?.title + ' Details';
+    },
   }));
 }

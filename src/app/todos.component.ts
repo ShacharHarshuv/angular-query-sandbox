@@ -10,6 +10,7 @@ import {
   injectMutation,
   injectQuery,
   injectQueryClient,
+  queryOptions,
 } from '@tanstack/angular-query-experimental';
 import { timeoutAsPromise } from './timeout-as-promise';
 
@@ -17,6 +18,11 @@ let serverState: Todo[] = [
   { id: '1', title: 'Do Laundry' },
   { id: '2', title: 'Walk Dog' },
 ];
+
+export const todosQueryOptions = () => queryOptions({
+  queryKey: ['todos'],
+  queryFn: () => timeoutAsPromise(1000, serverState),
+});
 
 @Component({
   selector: 'app-todos',
@@ -48,10 +54,7 @@ export class TodosComponent {
   todoOpen = output<string>();
 
   queryClient = injectQueryClient();
-  query = injectQuery<Todo[]>(() => ({
-    queryKey: ['todos'],
-    queryFn: () => timeoutAsPromise(1000, serverState),
-  }));
+  query = injectQuery(todosQueryOptions);
   mutation = injectMutation((client) => ({
     mutationFn: (todo: Todo) => {
       serverState = [...serverState, todo];
@@ -77,7 +80,7 @@ export class TodosComponent {
   }
 }
 
-interface Todo {
+export interface Todo {
   id: string;
   title: string;
 }
